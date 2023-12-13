@@ -1,13 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import altair as alt
 import scipy.stats as stats
-import plotly.express as px
-from scipy.integrate import simpson
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-from statsmodels.stats.proportion import proportions_ztest, binom_test
+from statsmodels.stats.proportion import proportions_ztest
 
 
 # Константы
