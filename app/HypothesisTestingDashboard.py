@@ -22,7 +22,7 @@ GENERAL_DESCRIPTION = (r"**Гипотезы $H_0$ и $H'$**" + "  \n"
                        r"**Закон распределения $f(z|H_0)$**" + "  \n"
                        r"$f(z|H_0)\sim N(0,1)$" + "  \n" + "  \n"
                        "**Критическая область**" + "  \n"
-                       "критическая область выбирается правосторонней" + "  \n" + "  \n")
+                       "критическая область выбирается правосторонней")
 
 
 DESCRIPTION_TEST_1 = (r"$p_1$ - вероятность того, что мужчина пропустит более {work_days} рабочих дней" + "  \n"
@@ -72,7 +72,7 @@ def load_data(uploaded_file):
                               sep="\,",
                               engine="python",
                               header=None)
-                  .apply(lambda x: x.str.replace('"', '')))
+                  .apply(lambda x: x.str.replace(r"\"", "")))
         return preprocess_data(raw_df)
     except Exception as e:
         st.warning(FILE_LOAD_ERROR)
@@ -121,7 +121,10 @@ def plot_density_function(stat, alpha):
         fig.add_trace(go.Scatter(x=x3, y=y3, fill='tozeroy', mode='none', fillcolor="rgba(109, 141, 255, 0.5)",
                                  name="p-value"
                                  ))
-    fig.update_layout(height=400, title="Функция плотности f(z|H_0)")
+    fig.update_layout(height=300, title="Функция плотности f(z|H_0)")
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=40, b=30),
+    )
     return fig
 
 
@@ -194,7 +197,10 @@ def plot_pdfs(count, nobs, step=0.001):
                                  fill='tozeroy',
                                  line_color="rgba(187, 0, 231, 0.8)"))
 
-    fig.update_layout(height=400, title="Распределение вероятностей")
+    fig.update_layout(height=300, title="Распределение вероятностей")
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=40, b=30),
+    )
     return fig
 
 
@@ -221,22 +227,24 @@ def show_results(count, nobs, stat, pval, alpha, description=""):
     with col11:
         st.write(description)
 
-        p1 = str(count[0]) + "/" + str(nobs[0])
-        p2 = str(count[1]) + "/" + str(nobs[1])
-
         res_str = "**Итоги проверки гипотезы**:  \n"
 
         if np.isnan(stat):
-            res_str += (r"Невозможно проверить гипотезу, так как: $\tilde "
+            p1 = str(count[0]) + "/" + str(nobs[0])
+            p2 = str(count[1]) + "/" + str(nobs[1])
+            st.write(res_str)
+            info_str = (r"так как: $\tilde "
                         fr"{r'p_1=' + p1 if p1 == '0/0' else 'p_2=' + p2}$" + "  \n")
+            st.subheader(fr":violet[Невозможно проверить гипотезу]")
+            st.write(info_str)
         else:
             res_str += (fr"Выборочное значение статистики критерия $z_в={round(stat, 5)}$" + "  \n"
                         fr"$P–value = {round(pval, 5)}$" + "  \n"
                         fr"Уровень значимости $\alpha={alpha}$" + "  \n"
-                        fr"$P–value {'>' if pval > alpha else '<'} \alpha \Rightarrow$ "
-                        fr"**Гипотеза $H_0$ {'принимается' if pval > alpha else r'отклоняется'}!**"
-                        fr"")
-        st.write(res_str)
+                        fr"$P–value {'>' if pval > alpha else '<'} \alpha$")
+            st.write(res_str)
+            st.subheader(fr"Гипотеза $H_0$ {':blue[принимается]' if pval > alpha else r':red[отклоняется]'}!")
+
     with col12:
         st.plotly_chart(plot_pdfs(count, nobs), use_container_width=True)
         st.plotly_chart(plot_density_function(stat, alpha), use_container_width=True)
