@@ -72,7 +72,7 @@ def load_data(uploaded_file):
                               sep="\,",
                               engine="python",
                               header=None)
-                  .apply(lambda x: x.str.replace(r"\"", "")))
+                  .apply(lambda x: x.str.replace('"', '')))
         return preprocess_data(raw_df)
     except Exception as e:
         st.warning(FILE_LOAD_ERROR)
